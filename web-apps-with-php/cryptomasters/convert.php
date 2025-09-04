@@ -31,7 +31,8 @@
         //     echo "<h2>Ooops - something isn't quite right!</h2>";
         // }
 
-        var_dump($_SERVER);
+        # dump information about a variable
+        // var_dump($_SERVER);
     ?>
 </body>
 </html>
