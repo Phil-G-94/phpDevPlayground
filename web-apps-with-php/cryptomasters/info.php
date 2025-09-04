@@ -1,0 +1,5 @@
+<?php
+
+# calling phpinfo()
+
+phpinfo();
