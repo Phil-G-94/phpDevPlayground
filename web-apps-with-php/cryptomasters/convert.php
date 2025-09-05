@@ -1,3 +1,7 @@
+<?php
+    require_once "./classes/CryptoConverter.php"; # `import` | `require` statement equivalent
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,29 +14,25 @@
 
     <?php
 
-        # reading the values from the form in index.php
-        # using superglobal variable $_GET
-
-        // $amount = $_GET["amount"];
-        // $crypto = $_GET["crypto"];
-
-        // echo "<p> You want to convert $amount from $crypto </p>"
-
         # using superglobal variable $_POST
 
         # if check - confirm values are set in the request
-        // if (isset($_POST["amount"]) && isset($_POST["crypto"])) {
+        if (isset($_POST["amount"]) && isset($_POST["crypto"])) {
 
-        //     $amount = $_POST["amount"];
-        //     $crypto = $_POST["crypto"];
+            $amount = $_POST["amount"];
+            $crypto = $_POST["crypto"];
 
-        //     echo "<p> You want to convert $amount from $crypto </p>";
-        // } else {
-        //     echo "<h2>Ooops - something isn't quite right!</h2>";
-        // }
+            $converter = new CryptoConverter($crypto);
+            $result = $converter->convert($amount);
 
-        # dump information about a variable
-        // var_dump($_SERVER);
+            echo "<p> You want to convert $amount $crypto </p>";
+
+            echo "<h2> You have USD $$result </h2>";
+
+        } else {
+            echo "<h2>Ooops - something isn't quite right!</h2>";
+        }
+
     ?>
 </body>
 </html>

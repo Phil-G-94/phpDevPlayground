@@ -12,7 +12,7 @@
 
     <form action="/convert.php" method="POST">
         <label for="amount">Amount</label>
-        <input type="number" name="amount" id="amount">
+        <input type="text" name="amount" id="amount">
 
         <label for="crypto">Crypto</label>
         <select name="crypto" id="currency">
