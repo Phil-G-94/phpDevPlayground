@@ -12,7 +12,7 @@ class CryptoConverter {
     }
 
     // methods
-    public function convert(float $value): float {
+    public function convert(float $value=1): float {
 
         $code = $this->currencyCode;
 
