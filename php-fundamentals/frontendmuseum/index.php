@@ -42,7 +42,6 @@
           <h2><?= htmlspecialchars($exhibit["title"]) ?></h2>
           <p><?= htmlspecialchars($exhibit["description"])?></p>
           <img src='gallery/<?= htmlspecialchars($exhibit["image"]) ?>' alt='<?= htmlspecialchars($exhibit["title"]) ?>' fetchpriority='high' decoding='sync'>
-
         </article>
       <?php endforeach; ?>
     </main>
