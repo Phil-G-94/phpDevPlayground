@@ -28,20 +28,22 @@
       <img src="images/logo.png" alt="Frontend Masters Museum" width="300" fetchpriority="high" />
     </h1>
     <main>
-      <ul>
-        <?php
-          include("classes.php");
-          $db = new DB();
-          $exhibits = $db->fetchAllRecords("SELECT * FROM exhibits");
-          foreach ($exhibits as $index => $exhibit):
-        ?>
-          <li>
-            <a href="details.php?index=<?= htmlspecialchars($exhibit["id"]) ?>">
-              <?= $exhibit["title"] ?>
-            </a>
-          </li>
-        <?php endforeach; ?>
-      </ul>
+      <?php
+
+        include("classes.php");
+
+        $db = new DB();
+
+        $exhibits = $db->fetchAllRecords("SELECT * FROM exhibits");
+
+        $exhibit = $exhibits[$_GET["index"] ?? 0];
+
+      ?>
+        <article>
+          <h2><?= htmlspecialchars($exhibit["title"]) ?></h2>
+          <p><?= htmlspecialchars($exhibit["description"])?></p>
+          <img src='gallery/<?= htmlspecialchars($exhibit["image"]) ?>' alt='<?= htmlspecialchars($exhibit["title"]) ?>' fetchpriority='high' decoding='sync'>
+        </article>
     </main>
   </body>
 </html>
