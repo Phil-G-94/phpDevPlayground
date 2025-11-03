@@ -3,7 +3,7 @@
         'name' => '__root__',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => 'c38dbd8317997b7555fe370c5da38f1c22327695',
+        'reference' => '5e5a45ce68afc49d2adfa591b8435eb8de0e8792',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         '__root__' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => 'c38dbd8317997b7555fe370c5da38f1c22327695',
+            'reference' => '5e5a45ce68afc49d2adfa591b8435eb8de0e8792',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -162,6 +162,15 @@
             'install_path' => __DIR__ . '/../slim/slim',
             'aliases' => array(),
             'dev_requirement' => false,
+        ),
+        'squizlabs/php_codesniffer' => array(
+            'pretty_version' => '4.0.0',
+            'version' => '4.0.0.0',
+            'reference' => '06113cfdaf117fc2165f9cd040bd0f17fcd5242d',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../squizlabs/php_codesniffer',
+            'aliases' => array(),
+            'dev_requirement' => true,
         ),
         'symfony/polyfill-php80' => array(
             'pretty_version' => 'v1.33.0',
