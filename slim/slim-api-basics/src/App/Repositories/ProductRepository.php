@@ -6,6 +6,9 @@ namespace App\Repositories;
 
 use PDO;
 use App\Database;
+use PDOStatement;
+use Slim\Exception\HttpException;
+use Psr\Http\Message\ServerRequestInterface as Request;
 
 class ProductRepository
 {
@@ -40,5 +43,36 @@ class ProductRepository
         $stmt->execute(); # executes the statement on the db
 
         return $stmt->fetch(PDO::FETCH_ASSOC); # return the result as associative array if exits / returns false otherwise
+    }
+
+    public function addProduct(Request $request, array $productData): PDOStatement|string
+    {
+      $sql = (
+        "INSERT INTO product (name, description, size)
+         VALUES (:name, :description, :size)
+        "
+      );
+
+      $pdo = $this->database->getConnection();
+
+      $stmt = $pdo->prepare($sql);
+
+      $stmt->bindValue(":name", $productData["name"], PDO::PARAM_STR);
+
+      if (empty($data["description"])) {
+        $stmt->bindValue(":description", $productData["description"], PDO::PARAM_NULL);
+      } else {
+        $stmt->bindValue(":description", $productData["description"], PDO::PARAM_STR);
+      }
+
+      $stmt->bindValue(":size", $productData["size"], PDO::PARAM_INT);
+
+      $stmt->execute();
+
+      if ($stmt === false) {
+        throw new HttpException($request, message: "Failed to add product", code: 500);
+      }
+
+      return $pdo->lastInsertId();
     }
 }

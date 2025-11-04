@@ -29,12 +29,16 @@ $app = AppFactory::create(); # instantiate app object
 $routeCollector = $app->getRouteCollector();
 $routeCollector->setDefaultInvocationStrategy(new RequestResponseArgs());
 
+# JSON body parser #
+
+$app->addBodyParsingMiddleware();
+
 # Error middleware #
 $error_middleware = $app->addErrorMiddleware(true, true, true);
 $error_handler = $error_middleware->getDefaultErrorHandler();
 $error_handler->forceContentType("application/json"); # return error msgs and logs as JSON
 
-# Content-Type custom middleware #
+# Content-Type custom middleware - all requests / responses set to application/json #
 
 $app->add(new AddJsonResponseHeader);
 
@@ -45,36 +49,21 @@ $app->get("/", function (Request $request, Response $response) {
     return $response;
 });
 
-$app->get("/api/products", function (Request $request, Response $response) {
+$app->get("/api/products", App\Controllers\ProductsIndex::class);
 
-    $repository = $this->get(App\Repositories\ProductRepository::class); # dependency injection
+# dynamic route implementation#
 
-    $data = $repository->getAll();
+$app->get("/api/products/{id:[a-z0-9]+}", App\Controllers\ProductIndex::class . ":show")->add(App\Middleware\GetProduct::class);
+# here we are telling Slim to execute the show() method on the ProductIndex class
 
-    $body = json_encode($data);
+# specify the mware that should run in response to a get rqst to this route
+# we pass in the fully qualified class name instead of a new instance of the class (like we did with AddJsonResponseHeader)
+# because ProductRepository is a dependency of the GetProduct class
+# and we're using a DI container to resolve dependencies?
 
-    $response->getBody()->write($body); #send response
-    return $response;
-});
-
-# dynamic route implementation - alt routing strategy #
-
-$app->get("/api/products/{id:[a-z0-9]+}", function (Request $request, Response $response, string $id) {
-
-    $repository = $this->get(App\Repositories\ProductRepository::class);
-
-    $data = $repository->getById((int) $id); # cast the string $id val to int and pass it to the instance of the ProductRepository class
-
-    if ($data === false) {
-        throw new \Slim\Exception\HttpNotFoundException($request, message: "404 - product not found!"); # throw exception
-    }
-
-    $body = json_encode($data);
-
-    $response->getBody()->write($body);
-
-    return $response;
-});
+$app->post("/api/products/", App\Controllers\ProductIndex::class . ":create");
 
 # run the app
 $app->run();
+
+
