@@ -7,6 +7,7 @@ use Slim\Factory\AppFactory;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use DI\ContainerBuilder;
+use Slim\App;
 use Slim\Handlers\Strategies\RequestResponseArgs;
 
 define("APP_ROOT", dirname(__DIR__));
@@ -49,19 +50,22 @@ $app->get("/", function (Request $request, Response $response) {
     return $response;
 });
 
-$app->get("/api/products", App\Controllers\ProductsIndex::class);
+$app->get("/api/products", \App\Controllers\ProductsIndex::class);
 
 # dynamic route implementation#
 
-$app->get("/api/products/{id:[a-z0-9]+}", App\Controllers\ProductIndex::class . ":show")->add(App\Middleware\GetProduct::class);
+$app->get("/api/products/{id:[0-9]+}", \App\Controllers\ProductIndex::class . ":show")->add(\App\Middleware\GetProduct::class);
 # here we are telling Slim to execute the show() method on the ProductIndex class
-
 # specify the mware that should run in response to a get rqst to this route
 # we pass in the fully qualified class name instead of a new instance of the class (like we did with AddJsonResponseHeader)
 # because ProductRepository is a dependency of the GetProduct class
 # and we're using a DI container to resolve dependencies?
 
-$app->post("/api/products/", App\Controllers\ProductIndex::class . ":create");
+$app->post("/api/products/",\App\Controllers\ProductIndex::class . ":create");
+
+$app->patch("/api/products/{id:[0-9]+}", \App\Controllers\ProductIndex::class . ":update")->add(\App\Middleware\GetProduct::class);
+
+$app->delete("/api/products/{id:[0-9]+}", \App\Controllers\ProductIndex::class . ":delete")->add(\App\Middleware\GetProduct::class);
 
 # run the app
 $app->run();

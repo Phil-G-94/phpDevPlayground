@@ -53,4 +53,44 @@ class ProductIndex
     return $response;
   }
 
+  public function update(Request $request, Response $response, string $id): Response
+  {
+    $body = $request->getParsedBody();
+
+    $this->validator = $this->validator->withData($body);
+
+    # user input validation #
+
+    if ( ! $this->validator->validate()) {
+      $response->getBody()->write(json_encode($this->validator->errors()));
+
+      return $response->withStatus(422);
+    }
+
+    $rows = $this->repository->updateProduct((int) $id, $body);
+
+    $data = json_encode([
+      "message" => "Product updated.",
+      "rowsUpdated" => $rows
+    ]);
+
+    $response->getBody()->write($data);
+
+    return $response->withStatus(200);
+  }
+
+  public function delete(Request $request, Response $response, string $id): Response
+  {
+    $rows = $this->repository->deleteProduct((int) $id);
+
+    $data = json_encode([
+      "message" => "Product deleted.",
+      "rowsDeleted" => $rows
+    ]);
+
+    $response->getBody()->write($data);
+
+    return $response->withStatus(200);
+  }
+
 }

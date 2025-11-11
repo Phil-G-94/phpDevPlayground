@@ -7,8 +7,6 @@ namespace App\Repositories;
 use PDO;
 use App\Database;
 use PDOStatement;
-use Slim\Exception\HttpException;
-use Psr\Http\Message\ServerRequestInterface as Request;
 
 class ProductRepository
 {
@@ -45,7 +43,7 @@ class ProductRepository
         return $stmt->fetch(PDO::FETCH_ASSOC); # return the result as associative array if exits / returns false otherwise
     }
 
-    public function addProduct(array $productData): PDOStatement|string
+    public function addProduct(array $data): PDOStatement|string
     {
       $sql = (
         "INSERT INTO product (name, description, size)
@@ -57,22 +55,68 @@ class ProductRepository
 
       $stmt = $pdo->prepare($sql);
 
-      $stmt->bindValue(":name", $productData["name"], PDO::PARAM_STR);
+      $stmt->bindValue(":name", $data["name"], PDO::PARAM_STR);
 
       if (empty($data["description"])) {
-        $stmt->bindValue(":description", $productData["description"], PDO::PARAM_NULL);
+        $stmt->bindValue(":description", $data["description"], PDO::PARAM_NULL);
       } else {
-        $stmt->bindValue(":description", $productData["description"], PDO::PARAM_STR);
+        $stmt->bindValue(":description", $data["description"], PDO::PARAM_STR);
       }
 
-      $stmt->bindValue(":size", $productData["size"], PDO::PARAM_INT);
+      $stmt->bindValue(":size", $data["size"], PDO::PARAM_INT);
 
       $stmt->execute();
 
-      if ($stmt === false) {
-        throw new HttpException($request, message: "Failed to add product", code: 500);
+      return $pdo->lastInsertId();
+    }
+
+    public function updateProduct(int $id, array $data): PDOStatement|int
+    {
+
+      $sql = (
+        "UPDATE product
+         SET name = :name, description = :description, size = :size
+         WHERE id = :id
+        "
+      );
+
+      $pdo = $this->database->getConnection();
+
+      $stmt = $pdo->prepare($sql);
+
+      $stmt->bindValue(":name", $data["name"], PDO::PARAM_STR);
+
+      if (empty($data["description"])) {
+        $stmt->bindValue(":description", $data["description"], PDO::PARAM_NULL);
+      } else {
+        $stmt->bindValue(":description", $data["description"], PDO::PARAM_STR);
       }
 
-      return $pdo->lastInsertId();
+      $stmt->bindValue(":size", $data["size"], PDO::PARAM_INT);
+
+      $stmt->bindValue(":id", $id, PDO::PARAM_INT);
+
+      $stmt->execute();
+
+      return $stmt->rowCount(); # return num of rows updated
+    }
+
+    public function deleteProduct(int $id): PDOStatement|int
+    {
+      $sql = (
+        "DELETE FROM product
+        WHERE id = :id
+        "
+      );
+
+      $pdo = $this->database->getConnection();
+
+      $stmt = $pdo->prepare($sql);
+
+      $stmt->bindValue(":id", $id, PDO::PARAM_INT);
+
+      $stmt->execute();
+
+      return $stmt->rowCount(); # return num of rows deleted;
     }
 }
