@@ -45,7 +45,7 @@ class ProductRepository
         return $stmt->fetch(PDO::FETCH_ASSOC); # return the result as associative array if exits / returns false otherwise
     }
 
-    public function addProduct(Request $request, array $productData): PDOStatement|string
+    public function addProduct(array $productData): PDOStatement|string
     {
       $sql = (
         "INSERT INTO product (name, description, size)

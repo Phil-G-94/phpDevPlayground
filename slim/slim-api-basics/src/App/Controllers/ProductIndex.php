@@ -7,11 +7,15 @@ namespace App\Controllers;
 use App\Repositories\ProductRepository;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
+use Valitron\Validator; # validation pkg #
 
 class ProductIndex
 {
-  public function __construct(private ProductRepository $repository)
+  public function __construct(private ProductRepository $repository, private Validator $validator)
   {
+    # validation rules #
+    $this->validator->mapFieldRules('name', ['required']);
+    $this->validator->mapFieldRules('size', ['required', 'integer', ['min', 1]]);
   }
 
   public function show(Request $request, Response $response): Response
@@ -29,7 +33,15 @@ class ProductIndex
   {
     $body = $request->getParsedBody();
 
-    $id = $this->repository->addProduct($request, $body);
+    $this->validator = $this->validator->withData($body);
+
+    # user input validation #
+    if ( ! $this->validator->validate()) {
+      $response->getBody()->write(json_encode($this->validator->errors()));
+      return $response->withStatus(422);
+    }
+
+    $id = $this->repository->addProduct($body);
 
     $body = json_encode([
       "message" => "Product created",
