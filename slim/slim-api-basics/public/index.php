@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 use App\Middleware\AddJsonResponseHeader;
 use Slim\Factory\AppFactory;
-use Psr\Http\Message\ServerRequestInterface as Request;
-use Psr\Http\Message\ResponseInterface as Response;
 use DI\ContainerBuilder;
 use Slim\App;
 use Slim\Handlers\Strategies\RequestResponseArgs;
+use App\Controllers\ProductIndex;
+use App\Controllers\ProductsIndex;
+use App\Controllers\RootIndex;
+use Slim\Routing\RouteCollectorProxy;
 
 define("APP_ROOT", dirname(__DIR__));
 
@@ -45,27 +47,37 @@ $app->add(new AddJsonResponseHeader);
 
 # static route implementation #
 
-$app->get("/", function (Request $request, Response $response) {
-    $response->getBody()->write("Root route");
-    return $response;
+$app->get("/", RootIndex::class);
+
+# grouping routes #
+# we can group routes that use the same root path #
+
+$app->group("/api", function (RouteCollectorProxy $group) {
+
+    $group->get("/products", ProductsIndex::class);
+
+
+    $group->post("/products",ProductIndex::class . ":create");
+
+    # we can also group routes that use the same middleware #
+    $group->group("", function (RouteCollectorProxy $group) {
+
+        # dynamic route implementation#
+        $group->get("/products/{id:[0-9]+}", ProductIndex::class . ":show");
+        # here we are telling Slim to execute the show() method on the ProductIndex class
+        # specify the mware that should run in response to a get rqst to this route
+        # we pass in the fully qualified class name instead of a new instance of the class (like we did with AddJsonResponseHeader)
+        # because ProductRepository is a dependency of the GetProduct class
+        # and we're using a DI container to resolve dependencies?
+
+        $group->patch("/products/{id:[0-9]+}", ProductIndex::class . ":update");
+
+        $group->delete("/products/{id:[0-9]+}", ProductIndex::class . ":delete");
+
+    })->add(\App\Middleware\GetProduct::class);
+
 });
 
-$app->get("/api/products", \App\Controllers\ProductsIndex::class);
-
-# dynamic route implementation#
-
-$app->get("/api/products/{id:[0-9]+}", \App\Controllers\ProductIndex::class . ":show")->add(\App\Middleware\GetProduct::class);
-# here we are telling Slim to execute the show() method on the ProductIndex class
-# specify the mware that should run in response to a get rqst to this route
-# we pass in the fully qualified class name instead of a new instance of the class (like we did with AddJsonResponseHeader)
-# because ProductRepository is a dependency of the GetProduct class
-# and we're using a DI container to resolve dependencies?
-
-$app->post("/api/products/",\App\Controllers\ProductIndex::class . ":create");
-
-$app->patch("/api/products/{id:[0-9]+}", \App\Controllers\ProductIndex::class . ":update")->add(\App\Middleware\GetProduct::class);
-
-$app->delete("/api/products/{id:[0-9]+}", \App\Controllers\ProductIndex::class . ":delete")->add(\App\Middleware\GetProduct::class);
 
 # run the app
 $app->run();
