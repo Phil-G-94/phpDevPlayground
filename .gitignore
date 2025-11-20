@@ -1,1 +1,28 @@
 *.vscode
+
+# Composer vendor folder
+*/vendor/
+
+# Composer files
+*/composer.lock
+
+# VSCode settings
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# PHP cache / logs
+*.log
+*.cache
+*.tmp
+
+# Environment files (never commit sensitive data)
+.env
+.env.local
+.env.*.local
+
+# Generated files
+/public/hot
+/public/mix-manifest.json
